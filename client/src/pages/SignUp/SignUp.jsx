@@ -3,7 +3,7 @@ import { FcGoogle } from 'react-icons/fc';
 import useAuth from '../../hooks/useAuth';
 import { toast } from 'react-hot-toast';
 import { TbFidgetSpinner } from 'react-icons/tb';
-import axios from 'axios';
+
 import { imageUpload } from '../../api/utils';
 const SignUp = () => {
   const { createUser, updateUserProfile, signInWithGoogle, loading } =
@@ -17,7 +17,7 @@ const SignUp = () => {
     const email = form.email.value;
     const password = form.password.value;
     const image = form.image.files[0];
- const photoURL = await imageUpload(image);
+    const photoURL = await imageUpload(image);
     try {
       //2. User Registration
       const result = await createUser(email, password);
