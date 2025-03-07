@@ -11,7 +11,7 @@ import {
   updateProfile,
 } from 'firebase/auth';
 import { app } from '../firebase/firebase.config';
-// import axios from 'axios';
+import axios from 'axios';
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext(null);
@@ -42,10 +42,11 @@ const AuthProvider = ({ children }) => {
     return signOut(auth);
   };
 
-  const updateUserProfile = (name, photo) => {
+  const updateUserProfile = (name, photoURL) => {
+    console.log(name, photoURL);
     return updateProfile(auth.currentUser, {
       displayName: name,
-      photoURL: photo,
+      photoURL: photoURL,
     });
   };
 
@@ -53,8 +54,18 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async currentUser => {
       console.log('CurrentUser-->', currentUser?.email);
+    
       if (currentUser?.email) {
         setUser(currentUser);
+        // save user db
+        await axios.post(
+          `${import.meta.env.VITE_API_URL}/users/${currentUser?.email}`,
+          {
+            name: currentUser.displayName,
+            email: currentUser.email,
+            image: currentUser.photoURL,
+          }
+        );
 
         // Get JWT token
         // await axios.post(
@@ -63,13 +74,14 @@ const AuthProvider = ({ children }) => {
         //     email: currentUser?.email,
         //   },
         //   { withCredentials: true }
-        // )
-      } else {
-        setUser(currentUser);
-        // await axios.get(`${import.meta.env.VITE_API_URL}/logout`, {
-        //   withCredentials: true,
-        // })
+        // );
       }
+      // else {
+      //   setUser(currentUser);
+      //   await axios.get(`${import.meta.env.VITE_API_URL}/logout`, {
+      //     withCredentials: true,
+      //   });
+      // }
       setLoading(false);
     });
     return () => {
